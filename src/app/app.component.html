@@ -1,0 +1,54 @@
+<main>
+  <section class="hero section-dark overflow-hidden">
+    <div class="hero-confetti" aria-hidden="true">
+      <i class="confetti confetti-a"></i><i class="confetti confetti-b"></i><i class="confetti confetti-c"></i>
+      <i class="confetti confetti-d"></i><i class="confetti confetti-e"></i><i class="confetti confetti-f"></i>
+      <i class="confetti confetti-g"></i><i class="confetti confetti-h"></i><i class="confetti confetti-i"></i>
+      <i class="confetti confetti-j"></i><i class="confetti confetti-k"></i><i class="confetti confetti-l"></i>
+    </div>
+    <div class="hero-top"><span class="eyebrow">SAVE THE DATE</span><span class="year-pill">ENERO &middot; 2027</span></div>
+    <div class="hero-copy" [@riseIn]>
+      <p class="kicker">LA FIESTA SE PONE EN MOVIMIENTO</p>
+      <img class="hero-art" src="assets/birthday-run-hero.png" alt="Birthday Run 2027, Elda Meza, carrera de cumplea&ntilde;os de 3 KM con dos gatos y corredores">
+      <p class="hero-caption">CARRERA DE CUMPLEA&Ntilde;OS <b>&middot;</b> <strong>3 KM</strong></p>
+    </div>
+    <a class="scroll-cue" href="#anuncio"><span>DESLIZA</span><b>&darr;</b></a>
+  </section>
+
+  <section class="flip-section" #flipSection id="anuncio">
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(0)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">01</span><p>EL ANUNCIO</p><strong>Desliza para<br>descubrir</strong><span class="back-arrow">&darr;</span></div>
+      <div class="flip-face flip-front section announcement"><div class="section-tag">01 / EL ANUNCIO</div><h2>S&iacute;, habr&aacute;<br><em>que correr</em> <span class="unicode-emoji">😌</span></h2><p class="lead">En enero de 2027 celebramos el cumplea&ntilde;os de Elda de una manera un poquito diferente: con una carrera de 3 kil&oacute;metros.</p><p>Todav&iacute;a faltan algunos meses, as&iacute; que este es tu aviso oficial para empezar a entrenar.</p><div class="sticker">NO HAY<br>EXCUSAS</div><button class="next-button" (click)="nextSection(0)">SIGUIENTE <span>&rarr;</span></button></div>
+    </div></div>
+  </section>
+
+  <section class="flip-section" #flipSection>
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(1)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">02</span><p>EL RETO</p><strong>Gira la tarjeta<br>y ponte en marcha</strong><span class="back-arrow">&darr;</span></div>
+      <div class="flip-face flip-front section challenge section-dark"><div class="section-tag pink">02 / EL RETO</div><div class="challenge-grid"><div><h2>EL<br><span>RETO</span></h2><div class="big-distance">3 <small>KM</small></div></div><div class="challenge-copy"><p>No necesitas ser corredor.<br>No necesitas romper ning&uacute;n r&eacute;cord.<br>Solo necesitas llegar a enero pudiendo sobrevivir 3 km <span class="unicode-emoji">😂</span></p><p>Puedes correrlos, trotarlos o combinar carrera y caminata. Lo importante ser&aacute; llegar a la meta.</p><div class="mini-icons"><div class="activity-icon"><span class="unicode-emoji">🚶</span><small>CAMINA</small></div><span>&rarr;</span><div class="activity-icon"><span class="unicode-emoji">🏃</span><small>TROTA</small></div><span>&rarr;</span><div class="activity-icon"><span class="unicode-emoji">🏁</span><small>META</small></div></div></div></div><button class="next-button light" (click)="nextSection(1)">SIGUIENTE <span>&rarr;</span></button></div>
+    </div></div>
+  </section>
+
+  <section class="flip-section" #flipSection>
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(2)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">03</span><p>PREPARACI&Oacute;N</p><strong>Poquito a poquito<br>se llega lejos</strong><span class="back-arrow">&darr;</span></div>
+      <div class="flip-face flip-front section prep"><div class="section-tag">03 / TIEMPO PARA PREPARARSE</div><h2>TIENES<br><em>TIEMPO</em> <span class="unicode-emoji">👀</span></h2><p class="lead">La carrera ser&aacute; en enero de 2027, as&iacute; que todav&iacute;a tienes tiempo para empezar poquito a poquito.</p><div class="steps"><div class="step" *ngFor="let step of steps"><span class="step-number">{{ step.number }}</span><span class="step-icon unicode-emoji">{{ step.icon }}</span><strong>{{ step.title }}</strong></div></div><button class="next-button" (click)="nextSection(2)">SIGUIENTE <span>&rarr;</span></button></div>
+    </div></div>
+  </section>
+
+  <section class="flip-section" #flipSection>
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(3)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">04</span><p>INFORMACI&Oacute;N</p><strong>Lo que sabemos<br>hasta ahora</strong><span class="back-arrow">&darr;</span></div>
+      <div class="flip-face flip-front section info section-dark"><div class="section-tag yellow">04 / INFORMACI&Oacute;N ACTUAL</div><h2>LO QUE<br><span>SABEMOS</span></h2><div class="info-card"><div class="detail" *ngFor="let item of details"><span class="detail-icon unicode-emoji">{{ item[0] }}</span><div><small>{{ item[1] }}</small><strong>{{ item[2] }}</strong></div></div></div><p class="info-note">M&aacute;s adelante recibir&aacute;s toda la informaci&oacute;n oficial.</p><button class="next-button light" (click)="nextSection(3)">SIGUIENTE <span>&rarr;</span></button></div>
+    </div></div>
+  </section>
+
+  <section class="flip-section" #flipSection>
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(4)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">05</span><p>TU MISI&Oacute;N</p><strong>Los 3 km<br>no se correr&aacute;n solos</strong><span class="back-arrow">&darr;</span></div>
+      <div class="flip-face flip-front section cta section-dark"><div class="starburst">&starf;</div><div class="section-tag yellow">05 / TU MISI&Oacute;N</div><p class="mission">Por ahora solo tienes una misi&oacute;n:</p><h2>EMPIEZA A<br><em>ENTRENAR</em> <span class="unicode-emoji">🏃</span></h2><p class="lead">Porque cuando llegue enero&hellip; esos 3 km no se van a correr solos.</p><div class="cats"><div class="cat-cutout orange"><img src="assets/birthday-run-hero.png" alt="Gato naranja con gorro de fiesta"></div><div class="cat-cutout gray"><img src="assets/birthday-run-hero.png" alt="Gato gris peque&ntilde;o con gorro de fiesta"></div></div><p class="easter">Advertencia: decir &ldquo;yo no corro&rdquo; no ser&aacute; aceptado como excusa en enero.</p><button class="next-button light" (click)="backToStart()">VOLVER AL INICIO <span>&uarr;</span></button></div>
+    </div></div>
+  </section>
+
+  <footer class="footer section-dark"><div class="footer-line"></div><p class="eyebrow">BIRTHDAY RUN 2027</p><div class="footer-name"><span class="script">Elda</span> <span>Meza</span></div><p>Nos vemos en la meta. <span class="unicode-emoji footer-heart">💗</span></p><small>M&aacute;s informaci&oacute;n pr&oacute;ximamente.</small></footer>
+</main>

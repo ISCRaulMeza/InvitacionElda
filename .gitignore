@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+
+# Angular build output and cache
+dist/
+.angular/
+
+# Local development logs
+angular-serve.log
+angular-serve-error.log
+*.log
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
