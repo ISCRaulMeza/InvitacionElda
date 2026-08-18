@@ -1,0 +1,76 @@
+name: Build y desplegar en IONOS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: produccion-ionos
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Publicar invitaci&oacute;n
+    runs-on: ubuntu-latest
+    environment: invitaciones
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar producci&oacute;n
+        run: npm run build
+
+      - name: Validar artefactos
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="dist/birthday-run/browser"
+          test -f "$ROOT/index.html"
+          test -f "$ROOT/assets/birthday-run-hero.png"
+
+      - name: Instalar cliente SFTP
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Desplegar por SFTP
+        shell: bash
+        env:
+          SFTP_HOST: ${{ secrets.IONOS_SFTP_HOST }}
+          SFTP_USER: ${{ secrets.IONOS_SFTP_USER }}
+          SFTP_PASSWORD: ${{ secrets.IONOS_SFTP_PASSWORD }}
+          REMOTE_PATH: ${{ secrets.IONOS_REMOTE_PATH }}
+        run: |
+          set -euo pipefail
+          for value in SFTP_HOST SFTP_USER SFTP_PASSWORD REMOTE_PATH; do
+            if [ -z "${!value:-}" ]; then echo "Falta el secreto $value" >&2; exit 1; fi
+          done
+          lftp -u "$SFTP_USER","$SFTP_PASSWORD" "sftp://$SFTP_HOST:22" <<EOF
+          set sftp:auto-confirm yes
+          set net:max-retries 2
+          set net:timeout 20
+          set mirror:parallel-transfer-count 2
+          mirror --reverse --verbose dist/birthday-run/browser/ "$REMOTE_PATH"
+          bye
+          EOF
+
+      - name: Verificar publicaci&oacute;n
+        shell: bash
+        env:
+          PUBLIC_URL: ${{ secrets.IONOS_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PUBLIC_URL" ]; then echo "Falta el secreto IONOS_PUBLIC_URL" >&2; exit 1; fi
+          curl --fail --silent --show-error --retry 4 --retry-delay 5 "${PUBLIC_URL%/}/index.html" >/dev/null
