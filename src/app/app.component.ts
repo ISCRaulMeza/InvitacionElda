@@ -31,7 +31,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   ];
 
   readonly details = [
-    ['📅', 'Fecha', 'ENERO 2027'], ['🏃', 'Distancia', '3 kil\u00F3metros'], ['🎂', 'Motivo', 'Birthday Run de Elda Meza'],
+    ['📅', 'Fecha', 'ENERO 2027'], ['🏃', 'Distancia', '3 kil\u00F3metros'], ['🎂', 'Motivo', 'Mi Birthday Run · Elda Meza'],
     ['📍', 'Lugar', 'Pr\u00F3ximamente'], ['⏰', 'Horario', 'Pr\u00F3ximamente'], ['🗺️', 'Ruta', 'Pr\u00F3ximamente']
   ];
 
