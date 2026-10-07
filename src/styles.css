@@ -74,6 +74,11 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
 .hero-top { gap:.75rem; }
 .hero-top .eyebrow { min-width:0; }
 .year-pill { flex:0 0 auto; white-space:nowrap; }
+.race-note { display:flex; align-items:center; gap:.8rem; margin:1.15rem 0 .4rem; padding:.8rem .95rem; border-radius:14px; background:var(--yellow); color:var(--ink); box-shadow:5px 5px 0 rgba(23,19,31,.22); transform:rotate(-1deg); }
+.race-note > .unicode-emoji { flex:0 0 auto; font-size:1.65rem; }
+.race-note strong,.race-note small { display:block; }
+.race-note strong { font-family:'Bowlby One SC',sans-serif; font-size:clamp(.7rem,2.6vw,.92rem); line-height:1.15; }
+.race-note small { margin-top:.35rem; font-size:.67rem; line-height:1.3; }
 .event-layout { display:grid; gap:1.5rem; }
 .map-card { min-width:0; border:1px solid #403846; border-radius:18px; overflow:hidden; background:#241e2b; }
 .map-card iframe { display:block; width:100%; height:230px; border:0; filter:saturate(.85) contrast(1.05); }
