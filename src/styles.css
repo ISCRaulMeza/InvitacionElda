@@ -69,6 +69,9 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
 /* Fecha confirmada, ubicación y registro */
 .hero-date { color:var(--turq); font-size:clamp(.72rem,2.3vw,1rem); font-weight:700; letter-spacing:.11em; margin:1rem 0 .35rem; }
 .hero-date + .hero-caption { margin-top:.35rem; }
+.hero-rsvp-button { display:inline-flex; align-items:center; gap:.75rem; margin-top:1rem; padding:.78rem 1.15rem; border-radius:999px; background:var(--pink); color:#fff; text-decoration:none; font-size:.66rem; font-weight:700; letter-spacing:.1em; box-shadow:0 8px 24px rgba(244,59,136,.25); transition:transform .2s ease,box-shadow .2s ease; }
+.hero-rsvp-button span { color:var(--yellow); font-size:1rem; }
+.hero-rsvp-button:hover { color:#fff; transform:translateY(-3px); box-shadow:0 12px 28px rgba(244,59,136,.35); }
 .hero-copy { width:100%; min-width:0; }
 .hero-art { max-width:100%; }
 .hero-top { gap:.75rem; }
@@ -105,6 +108,8 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
 .success-card .success-emoji { font-size:2.5rem; }
 .success-card p { color:var(--purple); font-size:.72rem; font-weight:700; letter-spacing:.15em; margin:1rem 0 .4rem; }
 .success-card h2 { font:700 1rem 'DM Sans',sans-serif; letter-spacing:.12em; margin:0; }
+.success-card .success-title { max-width:410px; margin:.9rem auto 1.3rem; font-family:'Bowlby One SC',sans-serif; font-size:clamp(1.35rem,5vw,2.2rem); line-height:1.08; color:var(--pink); }
+.success-card .success-wait { color:var(--purple); font-size:1.05rem; font-weight:700; }
 .success-card strong { display:block; color:var(--pink); font-family:'Bowlby One SC',sans-serif; font-size:clamp(6rem,28vw,10rem); line-height:1; margin:.2rem 0; }
 .success-card > span:last-child { display:block; font-size:.85rem; }
 

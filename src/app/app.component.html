@@ -11,8 +11,9 @@
     <div class="hero-copy" [@riseIn]>
       <p class="kicker">MI FIESTA SE PONE EN MOVIMIENTO</p>
       <img class="hero-art" src="assets/birthday-run-hero.png" alt="Birthday Run 2027, Elda Meza, carrera de cumpleaños de 3 KM con dos gatos y corredores">
-      <p class="hero-date">SÁBADO 9 DE ENERO · 8:30 A. M.</p>
+      <p class="hero-date">SÁBADO 9 DE ENERO · 8:00 A. M.</p>
       <p class="hero-caption">MI CARRERA DE CUMPLEAÑOS <b>·</b> <strong>3 KM</strong></p>
+      <a class="hero-rsvp-button" href="#confirmar">CONFIRMAR ASISTENCIA <span>↓</span></a>
     </div>
     <a class="scroll-cue" href="#anuncio"><span>DESLIZA</span><b>↓</b></a>
   </section>
@@ -47,8 +48,8 @@
 
   <section class="flip-section" #flipSection id="confirmar">
     <div class="flip-card" [class.is-flipped]="flippedSections.has(4)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">05</span><p>CONFIRMA TU ASISTENCIA</p><strong>Quiero reservarte<br>tu número</strong><span class="back-arrow">↓</span></div>
-      <div class="flip-face flip-front section rsvp"><div class="section-tag">05 / CONFIRMA TU ASISTENCIA</div><div *ngIf="!assignedNumber; else confirmationSuccess" class="rsvp-layout"><div><h2>¿CORRES<br><em>CONMIGO?</em> <span class="unicode-emoji">🎉</span></h2><p class="lead">Confírmame que vienes y te apartaré un número para entregártelo el día de la carrera.</p></div><form class="rsvp-form" (ngSubmit)="submitRsvp()" novalidate><label for="guestName">TU NOMBRE</label><input id="guestName" name="guestName" type="text" [(ngModel)]="guestName" autocomplete="name" maxlength="100" placeholder="Escribe tu nombre" [disabled]="rsvpLoading"><label class="confirm-check"><input type="checkbox" name="attendanceConfirmed" [(ngModel)]="attendanceConfirmed" [disabled]="rsvpLoading"><span>Sí, confirmo que asistiré el 9 de enero.</span></label><button class="confirm-button" type="submit" [disabled]="rsvpLoading">{{ rsvpLoading ? 'GUARDANDO…' : 'CONFIRMAR ASISTENCIA' }} <span>✓</span></button><p class="form-error" *ngIf="rsvpError" role="alert">{{ rsvpError }}</p><small>Solo usaré tu nombre para organizar la lista de participantes.</small></form></div><ng-template #confirmationSuccess><div class="success-card" aria-live="polite"><span class="success-emoji unicode-emoji">🎊</span><p>¡LISTO, {{ guestName }}!</p><h2>TU NÚMERO ES</h2><strong>{{ assignedNumber }}</strong><span>Guárdalo. Te lo entregaré el día de la carrera.</span></div></ng-template><button class="next-button" (click)="nextSection(4)">SIGUIENTE <span>→</span></button></div>
+      <div class="flip-face flip-back section-dark"><span class="back-number">05</span><p>CONFIRMA TU ASISTENCIA</p><strong>Quiero contar<br>contigo</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section rsvp"><div class="section-tag">05 / CONFIRMA TU ASISTENCIA</div><div *ngIf="!assignedNumber; else confirmationSuccess" class="rsvp-layout"><div><h2>¿CORRES<br><em>CONMIGO?</em> <span class="unicode-emoji">🎉</span></h2><p class="lead">Confírmame que vienes para poder organizar todo y esperarte en la salida.</p></div><form class="rsvp-form" (ngSubmit)="submitRsvp()" novalidate><label for="guestName">TU NOMBRE</label><input id="guestName" name="guestName" type="text" [(ngModel)]="guestName" autocomplete="name" maxlength="100" placeholder="Escribe tu nombre" [disabled]="rsvpLoading"><label class="confirm-check"><input type="checkbox" name="attendanceConfirmed" [(ngModel)]="attendanceConfirmed" [disabled]="rsvpLoading"><span>Sí, confirmo que asistiré el 9 de enero.</span></label><button class="confirm-button" type="submit" [disabled]="rsvpLoading">{{ rsvpLoading ? 'GUARDANDO…' : 'CONFIRMAR ASISTENCIA' }} <span>✓</span></button><p class="form-error" *ngIf="rsvpError" role="alert">{{ rsvpError }}</p><small>Solo usaré tu nombre para organizar la lista de participantes.</small></form></div><ng-template #confirmationSuccess><div class="success-card" aria-live="polite"><span class="success-emoji unicode-emoji">🎊</span><p>¡LISTO, {{ guestName }}!</p><h2 class="success-title">TU ASISTENCIA HA SIDO CONFIRMADA</h2><span class="success-wait">¡Te esperamos! 💛</span></div></ng-template><button class="next-button" (click)="nextSection(4)">SIGUIENTE <span>→</span></button></div>
     </div></div>
   </section>
 
