@@ -30,3 +30,9 @@ El workflow de GitHub Actions ejecuta en cada push y pull request hacia `main`:
 3. Publicaci&oacute;n del build como artefacto descargable durante 14 d&iacute;as.
 
 El workflow de despliegue compila la aplicaci&oacute;n y publica el resultado por SFTP en IONOS despu&eacute;s de cada push a `main`. Las credenciales y la URL p&uacute;blica se administran como secretos del entorno `invitaciones`.
+
+## Confirmaciones de asistencia
+
+La API PHP en `src/server/api/rsvp.php` guarda las confirmaciones en un CSV compartido dentro del servidor. Los n&uacute;meros 1 al 6 est&aacute;n reservados y la asignaci&oacute;n autom&aacute;tica comienza en el 7.
+
+La lista privada se consulta en `/adminList`. Desde esa pantalla puede descargarse en PDF o en CSV compatible con Excel. El despliegue comprueba que IONOS ejecute PHP y que la carpeta de datos tenga permisos de escritura.

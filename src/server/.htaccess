@@ -1,0 +1,10 @@
+RewriteEngine On
+
+# La API y los archivos reales se sirven directamente.
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Permite abrir /adminList directamente o recargar esa pantalla.
+RewriteRule ^adminList/?$ index.html [L]
+

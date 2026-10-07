@@ -65,3 +65,99 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
   .flip-front .next-button { right:1.15rem; bottom:1.15rem; }
   @supports (height:100dvh) { .flip-face { min-height:calc(100dvh - 1.5rem); } }
 }
+
+/* Fecha confirmada, ubicación y registro */
+.hero-date { color:var(--turq); font-size:clamp(.72rem,2.3vw,1rem); font-weight:700; letter-spacing:.11em; margin:1rem 0 .35rem; }
+.hero-date + .hero-caption { margin-top:.35rem; }
+.hero-copy { width:100%; min-width:0; }
+.hero-art { max-width:100%; }
+.hero-top { gap:.75rem; }
+.hero-top .eyebrow { min-width:0; }
+.year-pill { flex:0 0 auto; white-space:nowrap; }
+.event-layout { display:grid; gap:1.5rem; }
+.map-card { min-width:0; border:1px solid #403846; border-radius:18px; overflow:hidden; background:#241e2b; }
+.map-card iframe { display:block; width:100%; height:230px; border:0; filter:saturate(.85) contrast(1.05); }
+.map-card a { display:block; padding:.85rem 1rem; color:var(--yellow); text-decoration:none; font-size:.66rem; font-weight:700; letter-spacing:.1em; }
+.map-card a:hover { background:#302839; }
+.info .info-note { max-width:46rem; }
+
+.rsvp { background:var(--paper); }
+.rsvp h2 { font-size:clamp(2.6rem,12vw,5.5rem); line-height:.96; }
+.rsvp h2 em { color:var(--pink); font-style:normal; }
+.rsvp-layout { display:grid; gap:2rem; }
+.rsvp-form { align-self:center; background:#fff; border:2px solid var(--ink); border-radius:22px; padding:1.4rem; box-shadow:9px 9px 0 var(--yellow); }
+.rsvp-form > label:first-child,.admin-login-card form label { display:block; font-size:.65rem; font-weight:700; letter-spacing:.13em; margin-bottom:.55rem; }
+.rsvp-form input[type="text"],.admin-login-card input { width:100%; border:1px solid #bdb5bd; border-radius:12px; background:#fff; color:var(--ink); padding:.9rem 1rem; font:500 1rem 'DM Sans',sans-serif; outline:none; }
+.rsvp-form input[type="text"]:focus,.admin-login-card input:focus { border-color:var(--purple); box-shadow:0 0 0 4px rgba(122,87,209,.14); }
+.confirm-check { display:flex; align-items:flex-start; gap:.7rem; margin:1rem 0; font-size:.85rem; line-height:1.4; cursor:pointer; }
+.confirm-check input { flex:0 0 auto; width:19px; height:19px; margin-top:.05rem; accent-color:var(--pink); }
+.confirm-button,.admin-login-card button,.download-actions button,.admin-actions button { width:100%; border:0; border-radius:999px; background:var(--pink); color:#fff; padding:.9rem 1.1rem; font:700 .68rem 'DM Sans',sans-serif; letter-spacing:.1em; cursor:pointer; transition:transform .2s ease,opacity .2s ease; }
+.confirm-button:hover,.admin-login-card button:hover,.download-actions button:hover,.admin-actions button:hover { transform:translateY(-2px); }
+.confirm-button:disabled,.admin-login-card button:disabled,.admin-actions button:disabled { cursor:wait; opacity:.6; transform:none; }
+.rsvp-form > small { display:block; color:#766e78; font-size:.66rem; line-height:1.35; margin-top:1rem; }
+.form-error { color:#c81754; font-size:.78rem; font-weight:700; margin:.8rem 0 0; }
+.success-card { max-width:530px; margin:1rem auto; text-align:center; background:#fff; border:2px solid var(--ink); border-radius:25px; padding:1.6rem; box-shadow:10px 10px 0 var(--turq); }
+.success-card .success-emoji { font-size:2.5rem; }
+.success-card p { color:var(--purple); font-size:.72rem; font-weight:700; letter-spacing:.15em; margin:1rem 0 .4rem; }
+.success-card h2 { font:700 1rem 'DM Sans',sans-serif; letter-spacing:.12em; margin:0; }
+.success-card strong { display:block; color:var(--pink); font-family:'Bowlby One SC',sans-serif; font-size:clamp(6rem,28vw,10rem); line-height:1; margin:.2rem 0; }
+.success-card > span:last-child { display:block; font-size:.85rem; }
+
+/* Lista privada de asistentes */
+.admin-page { min-height:100vh; min-height:100dvh; background:var(--ink); color:var(--paper); }
+.admin-login { min-height:100vh; min-height:100dvh; display:grid; place-items:center; padding:1.25rem; background:radial-gradient(circle at 20% 15%,rgba(122,87,209,.34),transparent 35%),radial-gradient(circle at 85% 80%,rgba(244,59,136,.2),transparent 35%),var(--ink); }
+.admin-login-card { width:min(100%,430px); padding:2rem; background:var(--paper); color:var(--ink); border-radius:26px; box-shadow:0 24px 70px rgba(0,0,0,.38); }
+.admin-badge { display:inline-block; color:var(--pink); font-size:.64rem; font-weight:700; letter-spacing:.15em; }
+.admin-icon { font-size:2rem; margin:1.3rem 0 .5rem; }
+.admin-login-card h1,.admin-header h1 { font-family:'Bowlby One SC',sans-serif; line-height:1.03; }
+.admin-login-card h1 { font-size:2rem; margin:.4rem 0 1rem; }
+.admin-login-card > p:not(.form-error) { color:#6f6771; font-size:.9rem; line-height:1.5; }
+.admin-login-card form { margin:1.5rem 0; }
+.admin-login-card button { margin-top:1rem; background:var(--ink); }
+.admin-login-card > a { display:inline-block; color:var(--purple); font-size:.72rem; font-weight:700; margin-top:1.2rem; text-decoration:none; }
+.admin-shell { width:min(1180px,100%); margin:0 auto; padding:2rem 1rem 4rem; }
+.admin-header { display:flex; flex-direction:column; gap:1.5rem; padding:1rem 0 2rem; border-bottom:1px solid #403846; }
+.admin-header h1 { font-size:clamp(2rem,6vw,4rem); margin:.75rem 0 .65rem; }
+.admin-header p { color:#aaa0aa; margin:0; }
+.admin-actions { display:flex; gap:.65rem; }
+.admin-actions button { width:auto; background:var(--pink); }
+.admin-actions .ghost { background:transparent; border:1px solid #5b5260; }
+.admin-summary { display:grid; grid-template-columns:1fr auto; align-items:center; background:var(--turq); color:var(--ink); border-radius:20px; padding:1.2rem 1.4rem; margin:1.5rem 0; }
+.admin-summary span { font-size:.68rem; font-weight:700; letter-spacing:.13em; }
+.admin-summary strong { grid-row:span 2; font-family:'Bowlby One SC',sans-serif; font-size:3rem; line-height:1; color:var(--purple); }
+.admin-summary small { font-size:.72rem; color:#3e4750; margin-top:.2rem; }
+.attendee-table-wrap { overflow-x:auto; border:1px solid #403846; border-radius:20px; background:#211b28; }
+.attendee-table { width:100%; min-width:570px; border-collapse:collapse; }
+.attendee-table th { color:var(--yellow); font-size:.62rem; letter-spacing:.13em; text-align:left; padding:1rem 1.2rem; border-bottom:1px solid #403846; }
+.attendee-table td { padding:1rem 1.2rem; border-bottom:1px solid #352e3a; font-size:.9rem; }
+.attendee-table tr:last-child td { border-bottom:0; }
+.bib-number { display:grid; place-items:center; width:44px; height:34px; background:var(--paper); border-radius:7px; color:var(--pink); font-family:'Bowlby One SC',sans-serif; font-size:1rem; }
+.empty-list { text-align:center; border:1px dashed #4d4452; border-radius:20px; padding:4rem 1rem; color:#aaa0aa; }
+.empty-list span { font-size:2.5rem; }
+.download-actions { display:flex; flex-direction:column; gap:.75rem; margin-top:1.25rem; }
+.download-actions button { background:var(--pink); }
+.download-actions .secondary { background:var(--turq); color:var(--ink); }
+
+@media (min-width:768px) {
+  .event-layout { grid-template-columns:1.1fr .9fr; align-items:stretch; }
+  .info-card { grid-template-columns:1fr 1fr; margin-top:0; }
+  .map-card iframe { height:calc(100% - 43px); min-height:250px; }
+  .rsvp-layout { grid-template-columns:1.05fr .95fr; align-items:center; }
+  .admin-shell { padding:3rem 2rem 5rem; }
+  .admin-header { flex-direction:row; justify-content:space-between; align-items:flex-end; }
+  .admin-actions { flex:0 0 auto; }
+  .download-actions { flex-direction:row; justify-content:flex-end; }
+  .download-actions button { width:auto; }
+}
+
+@media (max-width:767.98px) {
+  .hero-top { right:auto; width:calc(100% - 2.7rem - env(safe-area-inset-left,0px) - env(safe-area-inset-right,0px)); }
+  .info h2 { font-size:clamp(2rem,10vw,3.4rem); }
+  .info-card { grid-template-columns:1fr 1fr; }
+  .detail { padding:.75rem 0; }
+  .detail strong { font-size:.68rem; }
+  .map-card iframe { height:190px; }
+  .rsvp-form { padding:1.1rem; box-shadow:6px 6px 0 var(--yellow); }
+  .success-card { padding:1.25rem; box-shadow:6px 6px 0 var(--turq); }
+  .admin-login-card { padding:1.5rem; }
+}

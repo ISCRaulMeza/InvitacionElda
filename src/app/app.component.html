@@ -1,3 +1,4 @@
+<ng-container *ngIf="!isAdminView; else adminView">
 <main>
   <section class="hero section-dark overflow-hidden">
     <div class="hero-confetti" aria-hidden="true">
@@ -6,49 +7,94 @@
       <i class="confetti confetti-g"></i><i class="confetti confetti-h"></i><i class="confetti confetti-i"></i>
       <i class="confetti confetti-j"></i><i class="confetti confetti-k"></i><i class="confetti confetti-l"></i>
     </div>
-    <div class="hero-top"><span class="eyebrow">APARTA EL MES</span><span class="year-pill">ENERO &middot; 2027</span></div>
+    <div class="hero-top"><span class="eyebrow">¡YA HAY FECHA!</span><span class="year-pill">09 · 01 · 2027</span></div>
     <div class="hero-copy" [@riseIn]>
       <p class="kicker">MI FIESTA SE PONE EN MOVIMIENTO</p>
-      <img class="hero-art" src="assets/birthday-run-hero.png" alt="Birthday Run 2027, Elda Meza, carrera de cumplea&ntilde;os de 3 KM con dos gatos y corredores">
-      <p class="hero-caption">MI CARRERA DE CUMPLEA&Ntilde;OS <b>&middot;</b> <strong>3 KM</strong></p>
+      <img class="hero-art" src="assets/birthday-run-hero.png" alt="Birthday Run 2027, Elda Meza, carrera de cumpleaños de 3 KM con dos gatos y corredores">
+      <p class="hero-date">SÁBADO 9 DE ENERO · 8:30 A. M.</p>
+      <p class="hero-caption">MI CARRERA DE CUMPLEAÑOS <b>·</b> <strong>3 KM</strong></p>
     </div>
-    <a class="scroll-cue" href="#anuncio"><span>DESLIZA</span><b>&darr;</b></a>
+    <a class="scroll-cue" href="#anuncio"><span>DESLIZA</span><b>↓</b></a>
   </section>
 
   <section class="flip-section" #flipSection id="anuncio">
     <div class="flip-card" [class.is-flipped]="flippedSections.has(0)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">01</span><p>MI ANUNCIO</p><strong>Tengo algo<br>que contarte</strong><span class="back-arrow">&darr;</span></div>
-      <div class="flip-face flip-front section announcement"><div class="section-tag">01 / MI ANUNCIO</div><h2>S&iacute;, habr&aacute;<br><em>que correr</em> <span class="unicode-emoji">😌</span></h2><p class="lead">En enero de 2027 quiero celebrar mi cumplea&ntilde;os de una manera un poquito diferente: con una carrera de 3 kil&oacute;metros.</p><p>Todav&iacute;a faltan algunos meses, as&iacute; que te mando este aviso oficial para que empieces a entrenar.</p><div class="sticker">NO HAY<br>EXCUSAS</div><button class="next-button" (click)="nextSection(0)">SIGUIENTE <span>&rarr;</span></button></div>
+      <div class="flip-face flip-back section-dark"><span class="back-number">01</span><p>MI ANUNCIO</p><strong>Tengo algo<br>que contarte</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section announcement"><div class="section-tag">01 / MI ANUNCIO</div><h2>Sí, habrá<br><em>que correr</em> <span class="unicode-emoji">😌</span></h2><p class="lead">El sábado 9 de enero de 2027 quiero celebrar mi cumpleaños de una manera un poquito diferente: con una carrera de 3 kilómetros.</p><p>Ya tenemos fecha, hora y lugar. Solo me falta algo muy importante: saber que contaré contigo.</p><div class="sticker">¡YA ES<br>OFICIAL!</div><button class="next-button" (click)="nextSection(0)">SIGUIENTE <span>→</span></button></div>
     </div></div>
   </section>
 
   <section class="flip-section" #flipSection>
     <div class="flip-card" [class.is-flipped]="flippedSections.has(1)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">02</span><p>MI RETO PARA TI</p><strong>Te invito a<br>ponerte en marcha</strong><span class="back-arrow">&darr;</span></div>
-      <div class="flip-face flip-front section challenge section-dark"><div class="section-tag pink">02 / MI RETO PARA TI</div><div class="challenge-grid"><div><h2>TE<br><span>RETO</span></h2><div class="big-distance">3 <small>KM</small></div></div><div class="challenge-copy"><p>No necesito que seas corredor.<br>No espero que rompas ning&uacute;n r&eacute;cord.<br>Solo quiero que llegues a enero pudiendo sobrevivir 3 km <span class="unicode-emoji">😂</span></p><p>Puedes correrlos, trotarlos o combinar carrera y caminata. Para m&iacute;, lo importante ser&aacute; verte llegar a la meta.</p><div class="mini-icons"><div class="activity-icon"><span class="unicode-emoji">🚶</span><small>CAMINA</small></div><span>&rarr;</span><div class="activity-icon"><span class="unicode-emoji">🏃</span><small>TROTA</small></div><span>&rarr;</span><div class="activity-icon"><span class="unicode-emoji">🏁</span><small>META</small></div></div></div></div><button class="next-button light" (click)="nextSection(1)">SIGUIENTE <span>&rarr;</span></button></div>
+      <div class="flip-face flip-back section-dark"><span class="back-number">02</span><p>MI RETO PARA TI</p><strong>Te invito a<br>ponerte en marcha</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section challenge section-dark"><div class="section-tag pink">02 / MI RETO PARA TI</div><div class="challenge-grid"><div><h2>TE<br><span>RETO</span></h2><div class="big-distance">3 <small>KM</small></div></div><div class="challenge-copy"><p>No necesito que seas corredor.<br>No espero que rompas ningún récord.<br>Solo quiero que llegues a enero pudiendo sobrevivir 3 km <span class="unicode-emoji">😂</span></p><p>Puedes correrlos, trotarlos o combinar carrera y caminata. Para mí, lo importante será verte llegar a la meta.</p><div class="mini-icons"><div class="activity-icon"><span class="unicode-emoji">🚶</span><small>CAMINA</small></div><span>→</span><div class="activity-icon"><span class="unicode-emoji">🏃</span><small>TROTA</small></div><span>→</span><div class="activity-icon"><span class="unicode-emoji">🏁</span><small>META</small></div></div></div></div><button class="next-button light" (click)="nextSection(1)">SIGUIENTE <span>→</span></button></div>
     </div></div>
   </section>
 
   <section class="flip-section" #flipSection>
     <div class="flip-card" [class.is-flipped]="flippedSections.has(2)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">03</span><p>TE DOY TIEMPO</p><strong>Quiero que empieces<br>poquito a poquito</strong><span class="back-arrow">&darr;</span></div>
-      <div class="flip-face flip-front section prep"><div class="section-tag">03 / TE DOY TIEMPO PARA PREPARARTE</div><h2>TE DOY<br><em>TIEMPO</em> <span class="unicode-emoji">👀</span></h2><p class="lead">Mi carrera ser&aacute; en enero de 2027, as&iacute; que todav&iacute;a tienes tiempo para empezar poquito a poquito.</p><div class="steps"><div class="step" *ngFor="let step of steps"><span class="step-number">{{ step.number }}</span><span class="step-icon unicode-emoji">{{ step.icon }}</span><strong>{{ step.title }}</strong></div></div><button class="next-button" (click)="nextSection(2)">SIGUIENTE <span>&rarr;</span></button></div>
+      <div class="flip-face flip-back section-dark"><span class="back-number">03</span><p>TE DOY TIEMPO</p><strong>Quiero que empieces<br>poquito a poquito</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section prep"><div class="section-tag">03 / TE DOY TIEMPO PARA PREPARARTE</div><h2>TE DOY<br><em>TIEMPO</em> <span class="unicode-emoji">👀</span></h2><p class="lead">Mi carrera será el 9 de enero de 2027, así que todavía tienes tiempo para empezar poquito a poquito.</p><div class="steps"><div class="step" *ngFor="let step of steps"><span class="step-number">{{ step.number }}</span><span class="step-icon unicode-emoji">{{ step.icon }}</span><strong>{{ step.title }}</strong></div></div><button class="next-button" (click)="nextSection(2)">SIGUIENTE <span>→</span></button></div>
     </div></div>
   </section>
 
-  <section class="flip-section" #flipSection>
+  <section class="flip-section" #flipSection id="detalles">
     <div class="flip-card" [class.is-flipped]="flippedSections.has(3)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">04</span><p>INFORMACI&Oacute;N</p><strong>Lo que puedo<br>contarte hasta ahora</strong><span class="back-arrow">&darr;</span></div>
-      <div class="flip-face flip-front section info section-dark"><div class="section-tag yellow">04 / LO QUE TE CUENTO</div><h2>LO QUE<br><span>TE CUENTO</span></h2><div class="info-card"><div class="detail" *ngFor="let item of details"><span class="detail-icon unicode-emoji">{{ item[0] }}</span><div><small>{{ item[1] }}</small><strong>{{ item[2] }}</strong></div></div></div><p class="info-note">M&aacute;s adelante te enviar&eacute; toda la informaci&oacute;n oficial.</p><button class="next-button light" (click)="nextSection(3)">SIGUIENTE <span>&rarr;</span></button></div>
+      <div class="flip-face flip-back section-dark"><span class="back-number">04</span><p>INFORMACIÓN</p><strong>Ya puedo contarte<br>todos los detalles</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section info section-dark"><div class="section-tag yellow">04 / DÓNDE Y CUÁNDO</div><h2>¡NOS VEMOS<br><span>EN EL PARQUE!</span></h2><div class="event-layout"><div class="info-card"><div class="detail" *ngFor="let item of details"><span class="detail-icon unicode-emoji">{{ item[0] }}</span><div><small>{{ item[1] }}</small><strong>{{ item[2] }}</strong></div></div></div><div class="map-card"><iframe [src]="mapUrl" title="Mapa del Parque Metropolitano de Guadalajara" loading="lazy" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe><a [href]="directionsUrl" target="_blank" rel="noopener">ABRIR EN GOOGLE MAPS ↗</a></div></div><p class="info-note">Llega a las 8:00 a. m. para estar listo cuando dé el banderazo de salida a las 8:30 a. m.</p><button class="next-button light" (click)="nextSection(3)">SIGUIENTE <span>→</span></button></div>
+    </div></div>
+  </section>
+
+  <section class="flip-section" #flipSection id="confirmar">
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(4)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">05</span><p>CONFIRMA TU ASISTENCIA</p><strong>Quiero reservarte<br>tu número</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section rsvp"><div class="section-tag">05 / CONFIRMA TU ASISTENCIA</div><div *ngIf="!assignedNumber; else confirmationSuccess" class="rsvp-layout"><div><h2>¿CORRES<br><em>CONMIGO?</em> <span class="unicode-emoji">🎉</span></h2><p class="lead">Confírmame que vienes y te apartaré un número para entregártelo el día de la carrera.</p></div><form class="rsvp-form" (ngSubmit)="submitRsvp()" novalidate><label for="guestName">TU NOMBRE</label><input id="guestName" name="guestName" type="text" [(ngModel)]="guestName" autocomplete="name" maxlength="100" placeholder="Escribe tu nombre" [disabled]="rsvpLoading"><label class="confirm-check"><input type="checkbox" name="attendanceConfirmed" [(ngModel)]="attendanceConfirmed" [disabled]="rsvpLoading"><span>Sí, confirmo que asistiré el 9 de enero.</span></label><button class="confirm-button" type="submit" [disabled]="rsvpLoading">{{ rsvpLoading ? 'GUARDANDO…' : 'CONFIRMAR ASISTENCIA' }} <span>✓</span></button><p class="form-error" *ngIf="rsvpError" role="alert">{{ rsvpError }}</p><small>Solo usaré tu nombre para organizar la lista de participantes.</small></form></div><ng-template #confirmationSuccess><div class="success-card" aria-live="polite"><span class="success-emoji unicode-emoji">🎊</span><p>¡LISTO, {{ guestName }}!</p><h2>TU NÚMERO ES</h2><strong>{{ assignedNumber }}</strong><span>Guárdalo. Te lo entregaré el día de la carrera.</span></div></ng-template><button class="next-button" (click)="nextSection(4)">SIGUIENTE <span>→</span></button></div>
     </div></div>
   </section>
 
   <section class="flip-section" #flipSection>
-    <div class="flip-card" [class.is-flipped]="flippedSections.has(4)"><div class="flip-card-inner">
-      <div class="flip-face flip-back section-dark"><span class="back-number">05</span><p>MI MISI&Oacute;N PARA TI</p><strong>Quiero verte<br>en la meta</strong><span class="back-arrow">&darr;</span></div>
-      <div class="flip-face flip-front section cta section-dark"><div class="starburst">&starf;</div><div class="section-tag yellow">05 / MI MISI&Oacute;N PARA TI</div><p class="mission">Por ahora, solo quiero pedirte una cosa:</p><h2>EMPIEZA A<br><em>ENTRENAR</em> <span class="unicode-emoji">🏃</span></h2><p class="lead">Te lo digo desde ahora: cuando llegue enero, esos 3 km no se van a correr solos.</p><div class="cats"><div class="cat-cutout orange"><img src="assets/birthday-run-hero.png" alt="Gato naranja con gorro de fiesta"></div><div class="cat-cutout gray"><img src="assets/birthday-run-hero.png" alt="Gato gris peque&ntilde;o con gorro de fiesta"></div></div><p class="easter">Advertencia de Elda: no aceptar&eacute; &ldquo;yo no corro&rdquo; como excusa en enero.</p><button class="next-button light" (click)="backToStart()">VOLVER AL INICIO <span>&uarr;</span></button></div>
+    <div class="flip-card" [class.is-flipped]="flippedSections.has(5)"><div class="flip-card-inner">
+      <div class="flip-face flip-back section-dark"><span class="back-number">06</span><p>MI MISIÓN PARA TI</p><strong>Quiero verte<br>en la meta</strong><span class="back-arrow">↓</span></div>
+      <div class="flip-face flip-front section cta section-dark"><div class="starburst">★</div><div class="section-tag yellow">06 / MI MISIÓN PARA TI</div><p class="mission">Ahora que ya sabes cuándo y dónde, solo quiero pedirte una cosa:</p><h2>EMPIEZA A<br><em>ENTRENAR</em> <span class="unicode-emoji">🏃</span></h2><p class="lead">Te lo digo desde ahora: cuando llegue enero, esos 3 km no se van a correr solos.</p><div class="cats"><div class="cat-cutout orange"><img src="assets/birthday-run-hero.png" alt="Gato naranja con gorro de fiesta"></div><div class="cat-cutout gray"><img src="assets/birthday-run-hero.png" alt="Gato gris pequeño con gorro de fiesta"></div></div><p class="easter">Advertencia de Elda: no aceptaré “yo no corro” como excusa en enero.</p><button class="next-button light" (click)="backToStart()">VOLVER AL INICIO <span>↑</span></button></div>
     </div></div>
   </section>
 
-  <footer class="footer section-dark"><div class="footer-line"></div><p class="eyebrow">BIRTHDAY RUN 2027</p><div class="footer-name"><span class="script">Elda</span> <span>Meza</span></div><p>Te veo en la meta. <span class="unicode-emoji footer-heart">💗</span></p><small>Muy pronto te contar&eacute; m&aacute;s.</small></footer>
+  <footer class="footer section-dark"><div class="footer-line"></div><p class="eyebrow">BIRTHDAY RUN 2027</p><div class="footer-name"><span class="script">Elda</span> <span>Meza</span></div><p>Te veo en la meta. <span class="unicode-emoji footer-heart">💗</span></p><small>Sábado 9 de enero · Parque Metropolitano de Guadalajara</small></footer>
 </main>
+</ng-container>
+
+<ng-template #adminView>
+  <main class="admin-page">
+    <section class="admin-login" *ngIf="!adminUnlocked; else attendeeList">
+      <div class="admin-login-card">
+        <span class="admin-badge">ÁREA PRIVADA</span>
+        <div class="unicode-emoji admin-icon">🔐</div>
+        <h1>Lista de asistentes</h1>
+        <p>Escribe la contraseña para consultar las confirmaciones.</p>
+        <form (ngSubmit)="unlockAdmin()">
+          <label for="adminPassword">CONTRASEÑA</label>
+          <input id="adminPassword" name="adminPassword" type="password" [(ngModel)]="adminPassword" autocomplete="current-password" inputmode="numeric" [disabled]="adminLoading">
+          <button type="submit" [disabled]="adminLoading">{{ adminLoading ? 'ENTRANDO…' : 'ENTRAR' }} →</button>
+        </form>
+        <p class="form-error" *ngIf="adminError" role="alert">{{ adminError }}</p>
+        <a href="./">← Volver a la invitación</a>
+      </div>
+    </section>
+
+    <ng-template #attendeeList>
+      <section class="admin-shell">
+        <header class="admin-header">
+          <div><span class="admin-badge">BIRTHDAY RUN 2027</span><h1>Asistentes confirmados</h1><p>Sábado 9 de enero · Parque Metropolitano de Guadalajara</p></div>
+          <div class="admin-actions"><button type="button" (click)="refreshAdmin()" [disabled]="adminLoading">↻ ACTUALIZAR</button><button type="button" class="ghost" (click)="lockAdmin()">SALIR</button></div>
+        </header>
+        <div class="admin-summary"><span>CONFIRMADOS</span><strong>{{ attendees.length }}</strong><small>Los números 1 al 6 están reservados.</small></div>
+        <p class="form-error" *ngIf="adminError" role="alert">{{ adminError }}</p>
+        <div class="empty-list" *ngIf="!attendees.length && !adminLoading"><span class="unicode-emoji">🏁</span><p>Todavía no hay confirmaciones.</p></div>
+        <div class="attendee-table-wrap" *ngIf="attendees.length">
+          <table class="attendee-table"><thead><tr><th>NÚMERO</th><th>NOMBRE</th><th>CONFIRMÓ EL</th></tr></thead><tbody><tr *ngFor="let person of attendees"><td><span class="bib-number">{{ person.number }}</span></td><td>{{ person.name }}</td><td>{{ person.confirmedAt }}</td></tr></tbody></table>
+        </div>
+        <div class="download-actions" *ngIf="attendees.length"><button type="button" (click)="downloadPdf()">DESCARGAR PDF</button><button type="button" class="secondary" (click)="downloadCsv()">DESCARGAR PARA EXCEL</button></div>
+      </section>
+    </ng-template>
+  </main>
+</ng-template>
