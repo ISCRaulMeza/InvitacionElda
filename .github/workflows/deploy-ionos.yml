@@ -81,7 +81,21 @@ jobs:
             --data '{"action":"health"}' \
             "${PUBLIC_URL%/}/api/rsvp.php")"
           echo "$RESPONSE" | grep -q '"ok":true'
+
+      - name: Verificar acceso a adminList
+        shell: bash
+        env:
+          PUBLIC_URL: ${{ secrets.IONOS_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
           ADMIN_HTML="$(curl --fail --silent --show-error --retry 4 --retry-delay 5 "${PUBLIC_URL%/}/adminList")"
           [[ "$ADMIN_HTML" == *'<app-root>'* ]]
+
+      - name: Verificar protecci&oacute;n de datos
+        shell: bash
+        env:
+          PUBLIC_URL: ${{ secrets.IONOS_PUBLIC_URL }}
+        run: |
+          set -euo pipefail
           DATA_STATUS="$(curl --silent --output /dev/null --write-out '%{http_code}' "${PUBLIC_URL%/}/api/data/.gitkeep")"
           test "$DATA_STATUS" = "403"
