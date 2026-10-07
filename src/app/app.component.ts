@@ -49,13 +49,23 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   adminPassword = '';
   adminUnlocked = false;
   adminLoading = false;
+  adminActionLoading = false;
   adminError = '';
+  adminNotice = '';
+  manualGuestName = '';
+  manualGuestNumber?: number;
+  pendingDelete?: Attendee;
+  reorderMode = false;
   attendees: Attendee[] = [];
 
   private lastScrollY = 0;
   private observer?: IntersectionObserver;
   private scrollTicking = false;
   private requestId = this.createRequestId();
+  private manualRequestId = this.createRequestId();
+  private originalAttendeeOrder: Attendee[] = [];
+  private reorderNumberSlots: number[] = [];
+  private draggedAttendeeNumber?: number;
 
   readonly steps = [
     { number: '01', title: 'Empieza caminando', icon: '🚶' },
@@ -165,7 +175,164 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   }
 
   async refreshAdmin(): Promise<void> {
+    this.adminNotice = '';
+    this.reorderMode = false;
+    this.originalAttendeeOrder = [];
+    this.reorderNumberSlots = [];
     await this.loadAttendees();
+  }
+
+  toggleOrderEditing(): void {
+    if (this.adminActionLoading) return;
+    this.adminError = '';
+    this.adminNotice = '';
+    if (this.reorderMode) {
+      this.attendees = this.originalAttendeeOrder.map((person) => ({ ...person }));
+      this.originalAttendeeOrder = [];
+      this.reorderNumberSlots = [];
+      this.reorderMode = false;
+      return;
+    }
+    this.originalAttendeeOrder = this.attendees.map((person) => ({ ...person }));
+    this.reorderNumberSlots = this.attendees.map((person) => person.number).sort((a, b) => a - b);
+    this.reorderMode = true;
+  }
+
+  displayedNumber(person: Attendee, index: number): number {
+    return this.reorderMode ? (this.reorderNumberSlots[index] ?? person.number) : person.number;
+  }
+
+  moveAttendee(index: number, direction: -1 | 1): void {
+    const targetIndex = index + direction;
+    if (!this.reorderMode || targetIndex < 0 || targetIndex >= this.attendees.length) return;
+    const reordered = [...this.attendees];
+    [reordered[index], reordered[targetIndex]] = [reordered[targetIndex], reordered[index]];
+    this.attendees = reordered;
+  }
+
+  startDragging(event: DragEvent, person: Attendee): void {
+    if (!this.reorderMode) return;
+    this.draggedAttendeeNumber = person.number;
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(person.number));
+    }
+  }
+
+  allowDrop(event: DragEvent): void {
+    if (!this.reorderMode) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'move';
+  }
+
+  dropAttendee(event: DragEvent, targetIndex: number): void {
+    if (!this.reorderMode || this.draggedAttendeeNumber === undefined) return;
+    event.preventDefault();
+    const sourceIndex = this.attendees.findIndex((person) => person.number === this.draggedAttendeeNumber);
+    if (sourceIndex < 0 || sourceIndex === targetIndex) return;
+    const reordered = [...this.attendees];
+    const [moved] = reordered.splice(sourceIndex, 1);
+    reordered.splice(targetIndex, 0, moved);
+    this.attendees = reordered;
+    this.draggedAttendeeNumber = undefined;
+  }
+
+  stopDragging(): void {
+    this.draggedAttendeeNumber = undefined;
+  }
+
+  async saveOrder(): Promise<void> {
+    if (!this.reorderMode) return;
+    this.adminActionLoading = true;
+    this.adminError = '';
+    this.adminNotice = '';
+    try {
+      const result = await this.callApi({
+        action: 'reorder',
+        password: this.adminPassword,
+        order: this.attendees.map((person) => person.number)
+      });
+      if (!result.ok) throw new Error(result.message || 'No fue posible guardar el orden.');
+      this.reorderMode = false;
+      this.originalAttendeeOrder = [];
+      this.reorderNumberSlots = [];
+      await this.loadAttendees();
+      this.adminNotice = 'El orden y los números fueron actualizados.';
+    } catch (error) {
+      this.adminError = error instanceof Error ? error.message : 'No fue posible guardar el orden.';
+    } finally {
+      this.adminActionLoading = false;
+    }
+  }
+
+  async addManualAttendee(): Promise<void> {
+    this.adminError = '';
+    this.adminNotice = '';
+    const name = this.manualGuestName.trim();
+    if (name.length < 2) {
+      this.adminError = 'Escribe el nombre del asistente que deseas agregar.';
+      return;
+    }
+    if (!Number.isInteger(this.manualGuestNumber) || (this.manualGuestNumber ?? 0) < 1) {
+      this.adminError = 'Escribe el número que deseas asignar.';
+      return;
+    }
+
+    this.adminActionLoading = true;
+    try {
+      const result = await this.callApi({
+        action: 'manual-add',
+        password: this.adminPassword,
+        name,
+        number: String(this.manualGuestNumber),
+        requestId: this.manualRequestId
+      });
+      if (!result.ok || !result.number) throw new Error(result.message || 'No fue posible agregar el registro.');
+      const assignedNumber = result.number;
+      this.manualGuestName = '';
+      this.manualGuestNumber = undefined;
+      this.manualRequestId = this.createRequestId();
+      await this.loadAttendees();
+      this.adminNotice = `${name} fue agregado con el número ${assignedNumber}.`;
+    } catch (error) {
+      this.adminError = error instanceof Error ? error.message : 'No fue posible agregar el registro.';
+    } finally {
+      this.adminActionLoading = false;
+    }
+  }
+
+  requestDelete(person: Attendee): void {
+    if (this.reorderMode) return;
+    this.adminError = '';
+    this.adminNotice = '';
+    this.pendingDelete = person;
+  }
+
+  cancelDelete(): void {
+    if (!this.adminActionLoading) this.pendingDelete = undefined;
+  }
+
+  async confirmDelete(): Promise<void> {
+    if (!this.pendingDelete) return;
+    const person = this.pendingDelete;
+    this.adminActionLoading = true;
+    this.adminError = '';
+    this.adminNotice = '';
+    try {
+      const result = await this.callApi({
+        action: 'delete',
+        password: this.adminPassword,
+        number: String(person.number)
+      });
+      if (!result.ok) throw new Error(result.message || 'No fue posible eliminar el registro.');
+      this.attendees = this.attendees.filter((attendee) => attendee.number !== person.number);
+      this.pendingDelete = undefined;
+      this.adminNotice = `${person.name} fue eliminado de la lista.`;
+    } catch (error) {
+      this.adminError = error instanceof Error ? error.message : 'No fue posible eliminar el registro.';
+    } finally {
+      this.adminActionLoading = false;
+    }
   }
 
   lockAdmin(): void {
@@ -173,6 +340,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.adminPassword = '';
     this.attendees = [];
     this.adminError = '';
+    this.adminNotice = '';
+    this.manualGuestName = '';
+    this.manualGuestNumber = undefined;
+    this.pendingDelete = undefined;
+    this.reorderMode = false;
+    this.originalAttendeeOrder = [];
+    this.reorderNumberSlots = [];
   }
 
   downloadCsv(): void {
@@ -245,7 +419,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async callApi(body: Record<string, string>): Promise<ApiResponse> {
+  private async callApi(body: Record<string, unknown>): Promise<ApiResponse> {
     const response = await fetch(new URL('api/rsvp.php', document.baseURI), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },

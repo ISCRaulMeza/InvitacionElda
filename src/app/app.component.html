@@ -86,15 +86,26 @@
       <section class="admin-shell">
         <header class="admin-header">
           <div><span class="admin-badge">BIRTHDAY RUN 2027</span><h1>Asistentes confirmados</h1><p>Sábado 9 de enero · Parque Metropolitano de Guadalajara</p></div>
-          <div class="admin-actions"><button type="button" (click)="refreshAdmin()" [disabled]="adminLoading">↻ ACTUALIZAR</button><button type="button" class="ghost" (click)="lockAdmin()">SALIR</button></div>
+          <div class="admin-actions"><button type="button" (click)="refreshAdmin()" [disabled]="adminLoading || adminActionLoading || reorderMode">↻ ACTUALIZAR</button><button type="button" class="order-button" *ngIf="attendees.length" (click)="toggleOrderEditing()" [disabled]="adminActionLoading">{{ reorderMode ? 'CANCELAR ORDEN' : '↕ EDITAR ORDEN' }}</button><button type="button" class="save-order" *ngIf="reorderMode" (click)="saveOrder()" [disabled]="adminActionLoading">{{ adminActionLoading ? 'GUARDANDO…' : '✓ GUARDAR ORDEN' }}</button><button type="button" class="ghost" (click)="lockAdmin()" [disabled]="adminActionLoading">SALIR</button></div>
         </header>
         <div class="admin-summary"><span>CONFIRMADOS</span><strong>{{ attendees.length }}</strong><small>Los números 1 al 6 están reservados.</small></div>
+        <form class="admin-add-card" *ngIf="!reorderMode" (ngSubmit)="addManualAttendee()">
+          <div><span class="unicode-emoji">➕</span><div><strong>AGREGAR ASISTENTE</strong><small>Registra manualmente a una persona con el número que tú elijas.</small></div></div>
+          <div class="admin-add-controls"><input name="manualGuestName" type="text" [(ngModel)]="manualGuestName" maxlength="100" autocomplete="off" placeholder="Nombre del asistente" [disabled]="adminActionLoading"><input class="number-input" name="manualGuestNumber" type="number" [(ngModel)]="manualGuestNumber" min="1" step="1" inputmode="numeric" placeholder="Número" aria-label="Número de participante" [disabled]="adminActionLoading"><button type="submit" [disabled]="adminActionLoading">{{ adminActionLoading ? 'GUARDANDO…' : 'AGREGAR' }}</button></div>
+        </form>
+        <div class="reorder-tip" *ngIf="reorderMode"><span class="unicode-emoji">↕️</span><div><strong>EDITANDO EL ORDEN</strong><small>Arrastra las filas o usa las flechas. Al guardar, los números se ajustarán a la nueva posición.</small></div></div>
         <p class="form-error" *ngIf="adminError" role="alert">{{ adminError }}</p>
+        <p class="admin-notice" *ngIf="adminNotice" role="status">✓ {{ adminNotice }}</p>
         <div class="empty-list" *ngIf="!attendees.length && !adminLoading"><span class="unicode-emoji">🏁</span><p>Todavía no hay confirmaciones.</p></div>
         <div class="attendee-table-wrap" *ngIf="attendees.length">
-          <table class="attendee-table"><thead><tr><th>NÚMERO</th><th>NOMBRE</th><th>CONFIRMÓ EL</th></tr></thead><tbody><tr *ngFor="let person of attendees"><td><span class="bib-number">{{ person.number }}</span></td><td>{{ person.name }}</td><td>{{ person.confirmedAt }}</td></tr></tbody></table>
+          <table class="attendee-table"><thead><tr><th *ngIf="reorderMode">ORDEN</th><th>NÚMERO</th><th>NOMBRE</th><th>CONFIRMÓ EL</th><th>ACCIÓN</th></tr></thead><tbody><tr *ngFor="let person of attendees; let index = index" [class.reorder-row]="reorderMode" [attr.draggable]="reorderMode" (dragstart)="startDragging($event, person)" (dragover)="allowDrop($event)" (drop)="dropAttendee($event, index)" (dragend)="stopDragging()"><td class="reorder-controls" *ngIf="reorderMode"><span class="drag-grip" title="Arrastrar fila" aria-hidden="true"><i></i></span><button type="button" (click)="moveAttendee(index, -1)" [disabled]="index === 0 || adminActionLoading" [attr.aria-label]="'Subir a ' + person.name">↑</button><button type="button" (click)="moveAttendee(index, 1)" [disabled]="index === attendees.length - 1 || adminActionLoading" [attr.aria-label]="'Bajar a ' + person.name">↓</button></td><td><span class="bib-number">{{ displayedNumber(person, index) }}</span></td><td>{{ person.name }}</td><td>{{ person.confirmedAt }}</td><td><span class="order-pending" *ngIf="reorderMode">PENDIENTE</span><button class="delete-record" *ngIf="!reorderMode" type="button" (click)="requestDelete(person)" [disabled]="adminActionLoading">ELIMINAR</button></td></tr></tbody></table>
         </div>
         <div class="download-actions" *ngIf="attendees.length"><button type="button" (click)="downloadPdf()">DESCARGAR PDF</button><button type="button" class="secondary" (click)="downloadCsv()">DESCARGAR PARA EXCEL</button></div>
+        <div class="delete-dialog-backdrop" *ngIf="pendingDelete" (click)="cancelDelete()">
+          <section class="delete-dialog" role="alertdialog" aria-modal="true" aria-labelledby="deleteTitle" (click)="$event.stopPropagation()">
+            <span class="unicode-emoji">⚠️</span><h2 id="deleteTitle">¿Eliminar este registro?</h2><p>Vas a eliminar a <strong>{{ pendingDelete.name }}</strong>, con el número <strong>{{ pendingDelete.number }}</strong>.</p><p>Esta acción no se puede deshacer. ¿De verdad quieres continuar?</p><div><button type="button" class="cancel-delete" (click)="cancelDelete()" [disabled]="adminActionLoading">NO, CONSERVAR</button><button type="button" class="confirm-delete" (click)="confirmDelete()" [disabled]="adminActionLoading">{{ adminActionLoading ? 'ELIMINANDO…' : 'SÍ, ELIMINAR' }}</button></div>
+          </section>
+        </div>
       </section>
     </ng-template>
   </main>

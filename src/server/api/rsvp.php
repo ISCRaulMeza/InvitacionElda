@@ -16,6 +16,93 @@ function respond(int $status, array $payload): void
     exit;
 }
 
+function validAdminPassword(array $input): bool
+{
+    $password = (string) ($input['password'] ?? '');
+    return hash_equals(ADMIN_PASSWORD_HASH, hash('sha256', $password));
+}
+
+function requireAdmin(array $input): void
+{
+    if (!validAdminPassword($input)) {
+        usleep(350000);
+        respond(401, ['ok' => false, 'message' => 'La contraseña no es correcta.']);
+    }
+}
+
+function normalizeName(array $input): string
+{
+    $name = trim(preg_replace('/\s+/u', ' ', (string) ($input['name'] ?? '')) ?? '');
+    if (strlen($name) < 2 || strlen($name) > MAX_NAME_LENGTH) {
+        respond(422, ['ok' => false, 'message' => 'Escribe un nombre válido de máximo 100 caracteres.']);
+    }
+    if (preg_match('/^[=+@-]/', $name)) {
+        respond(422, ['ok' => false, 'message' => 'El nombre contiene un carácter inicial no permitido.']);
+    }
+    return $name;
+}
+
+function validateRequestId(array $input): string
+{
+    $requestId = trim((string) ($input['requestId'] ?? ''));
+    if (!preg_match('/^[a-zA-Z0-9-]{8,80}$/', $requestId)) {
+        respond(422, ['ok' => false, 'message' => 'No fue posible validar el registro. Recarga la página e intenta otra vez.']);
+    }
+    return $requestId;
+}
+
+function addAttendee(string $csvPath, string $name, string $requestId, ?int $requestedNumber = null): int
+{
+    $file = fopen($csvPath, 'c+');
+    if ($file === false || !flock($file, LOCK_EX)) {
+        if (is_resource($file)) fclose($file);
+        respond(500, ['ok' => false, 'message' => 'La lista está ocupada. Intenta nuevamente.']);
+    }
+
+    $usedNumbers = [];
+    $existingNumber = null;
+    rewind($file);
+    while (($row = fgetcsv($file)) !== false) {
+        if (isset($row[0]) && is_numeric($row[0])) {
+            $usedNumbers[(int) $row[0]] = true;
+        }
+        if (isset($row[3]) && hash_equals((string) $row[3], $requestId)) {
+            $existingNumber = (int) $row[0];
+        }
+    }
+
+    if ($existingNumber !== null) {
+        flock($file, LOCK_UN);
+        fclose($file);
+        return $existingNumber;
+    }
+
+    if ($requestedNumber !== null && isset($usedNumbers[$requestedNumber])) {
+        flock($file, LOCK_UN);
+        fclose($file);
+        respond(409, ['ok' => false, 'message' => "El número {$requestedNumber} ya está asignado. Elige otro."]);
+    }
+
+    $number = $requestedNumber ?? FIRST_AVAILABLE_NUMBER;
+    while ($requestedNumber === null && isset($usedNumbers[$number])) {
+        $number++;
+    }
+    date_default_timezone_set('America/Mexico_City');
+    fseek($file, 0, SEEK_END);
+    if (ftell($file) === 0) {
+        fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
+    }
+    $written = fputcsv($file, [$number, $name, date('Y-m-d H:i:s'), $requestId]);
+    fflush($file);
+    flock($file, LOCK_UN);
+    fclose($file);
+
+    if ($written === false) {
+        respond(500, ['ok' => false, 'message' => 'No se pudo guardar el registro. Intenta de nuevo.']);
+    }
+    return $number;
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     respond(405, ['ok' => false, 'message' => 'Método no permitido.']);
 }
@@ -42,17 +129,25 @@ if ($action === 'health') {
 }
 
 if ($action === 'confirm') {
-    $name = trim(preg_replace('/\s+/u', ' ', (string) ($input['name'] ?? '')) ?? '');
-    $requestId = trim((string) ($input['requestId'] ?? ''));
+    $number = addAttendee($csvPath, normalizeName($input), validateRequestId($input));
+    respond(201, ['ok' => true, 'number' => $number]);
+}
 
-    if (strlen($name) < 2 || strlen($name) > MAX_NAME_LENGTH) {
-        respond(422, ['ok' => false, 'message' => 'Escribe un nombre válido de máximo 100 caracteres.']);
+if ($action === 'manual-add') {
+    requireAdmin($input);
+    $requestedNumber = filter_var($input['number'] ?? null, FILTER_VALIDATE_INT);
+    if ($requestedNumber === false || $requestedNumber < 1) {
+        respond(422, ['ok' => false, 'message' => 'Escribe un número de participante válido.']);
     }
-    if (!preg_match('/^[a-zA-Z0-9-]{8,80}$/', $requestId)) {
-        respond(422, ['ok' => false, 'message' => 'No fue posible validar la confirmación. Recarga la página e intenta otra vez.']);
-    }
-    if (preg_match('/^[=+@-]/', $name)) {
-        respond(422, ['ok' => false, 'message' => 'El nombre contiene un carácter inicial no permitido.']);
+    $number = addAttendee($csvPath, normalizeName($input), validateRequestId($input), $requestedNumber);
+    respond(201, ['ok' => true, 'number' => $number]);
+}
+
+if ($action === 'reorder') {
+    requireAdmin($input);
+    $order = $input['order'] ?? null;
+    if (!is_array($order)) {
+        respond(422, ['ok' => false, 'message' => 'El orden recibido no es válido.']);
     }
 
     $file = fopen($csvPath, 'c+');
@@ -61,48 +156,96 @@ if ($action === 'confirm') {
         respond(500, ['ok' => false, 'message' => 'La lista está ocupada. Intenta nuevamente.']);
     }
 
-    $highestNumber = FIRST_AVAILABLE_NUMBER - 1;
-    $existingNumber = null;
+    $rowsByNumber = [];
     rewind($file);
     while (($row = fgetcsv($file)) !== false) {
-        if (isset($row[0]) && is_numeric($row[0])) {
-            $highestNumber = max($highestNumber, (int) $row[0]);
-        }
-        if (isset($row[3]) && hash_equals((string) $row[3], $requestId)) {
-            $existingNumber = (int) $row[0];
-        }
+        if (!isset($row[0]) || !is_numeric($row[0])) continue;
+        $rowsByNumber[(int) $row[0]] = $row;
     }
 
-    if ($existingNumber !== null) {
+    $requestedOrder = [];
+    foreach ($order as $value) {
+        $number = filter_var($value, FILTER_VALIDATE_INT);
+        if ($number === false || !isset($rowsByNumber[$number]) || isset($requestedOrder[$number])) {
+            flock($file, LOCK_UN);
+            fclose($file);
+            respond(409, ['ok' => false, 'message' => 'La lista cambió. Actualízala antes de guardar el orden.']);
+        }
+        $requestedOrder[$number] = true;
+    }
+
+    if (count($requestedOrder) !== count($rowsByNumber)) {
         flock($file, LOCK_UN);
         fclose($file);
-        respond(200, ['ok' => true, 'number' => $existingNumber]);
+        respond(409, ['ok' => false, 'message' => 'La lista cambió. Actualízala antes de guardar el orden.']);
     }
 
-    $number = max(FIRST_AVAILABLE_NUMBER, $highestNumber + 1);
-    date_default_timezone_set('America/Mexico_City');
-    fseek($file, 0, SEEK_END);
-    if (ftell($file) === 0) {
-        fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
+    $availableNumbers = array_keys($rowsByNumber);
+    sort($availableNumbers, SORT_NUMERIC);
+    $reorderedRows = [];
+    foreach (array_keys($requestedOrder) as $index => $oldNumber) {
+        $row = $rowsByNumber[$oldNumber];
+        $row[0] = (string) $availableNumbers[$index];
+        $reorderedRows[] = $row;
     }
-    $written = fputcsv($file, [$number, $name, date('Y-m-d H:i:s'), $requestId]);
+
+    rewind($file);
+    ftruncate($file, 0);
+    fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
+    foreach ($reorderedRows as $row) {
+        fputcsv($file, $row);
+    }
     fflush($file);
     flock($file, LOCK_UN);
     fclose($file);
+    respond(200, ['ok' => true]);
+}
 
-    if ($written === false) {
-        respond(500, ['ok' => false, 'message' => 'No pude guardar tu confirmación. Intenta de nuevo.']);
+if ($action === 'delete') {
+    requireAdmin($input);
+    $number = filter_var($input['number'] ?? null, FILTER_VALIDATE_INT);
+    if ($number === false || $number < 1) {
+        respond(422, ['ok' => false, 'message' => 'El número de participante no es válido.']);
     }
-    respond(201, ['ok' => true, 'number' => $number]);
+
+    $file = fopen($csvPath, 'c+');
+    if ($file === false || !flock($file, LOCK_EX)) {
+        if (is_resource($file)) fclose($file);
+        respond(500, ['ok' => false, 'message' => 'La lista está ocupada. Intenta nuevamente.']);
+    }
+
+    $remainingRows = [];
+    $found = false;
+    rewind($file);
+    while (($row = fgetcsv($file)) !== false) {
+        if (!isset($row[0]) || !is_numeric($row[0])) continue;
+        if ((int) $row[0] === $number) {
+            $found = true;
+            continue;
+        }
+        $remainingRows[] = $row;
+    }
+
+    if (!$found) {
+        flock($file, LOCK_UN);
+        fclose($file);
+        respond(404, ['ok' => false, 'message' => 'El registro ya no existe.']);
+    }
+
+    rewind($file);
+    ftruncate($file, 0);
+    fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
+    foreach ($remainingRows as $row) {
+        fputcsv($file, $row);
+    }
+    fflush($file);
+    flock($file, LOCK_UN);
+    fclose($file);
+    respond(200, ['ok' => true]);
 }
 
 if ($action === 'list') {
-    $password = (string) ($input['password'] ?? '');
-    if (!hash_equals(ADMIN_PASSWORD_HASH, hash('sha256', $password))) {
-        usleep(350000);
-        respond(401, ['ok' => false, 'message' => 'La contraseña no es correcta.']);
-    }
-
+    requireAdmin($input);
     $attendees = [];
     if (is_file($csvPath)) {
         $file = fopen($csvPath, 'r');
