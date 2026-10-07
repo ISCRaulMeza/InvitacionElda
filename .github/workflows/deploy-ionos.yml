@@ -43,6 +43,7 @@ jobs:
           test -f "$ROOT/assets/birthday-run-hero.png"
           test -f "$ROOT/.htaccess"
           test -f "$ROOT/api/rsvp.php"
+          test -f "$ROOT/adminList/index.php"
 
       - name: Instalar cliente SFTP
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
