@@ -81,6 +81,7 @@ jobs:
             --data '{"action":"health"}' \
             "${PUBLIC_URL%/}/api/rsvp.php")"
           echo "$RESPONSE" | grep -q '"ok":true'
-          curl --fail --silent --show-error --retry 4 --retry-delay 5 "${PUBLIC_URL%/}/adminList" | grep -q '<app-root>'
+          ADMIN_HTML="$(curl --fail --silent --show-error --retry 4 --retry-delay 5 "${PUBLIC_URL%/}/adminList")"
+          [[ "$ADMIN_HTML" == *'<app-root>'* ]]
           DATA_STATUS="$(curl --silent --output /dev/null --write-out '%{http_code}' "${PUBLIC_URL%/}/api/data/.gitkeep")"
           test "$DATA_STATUS" = "403"
