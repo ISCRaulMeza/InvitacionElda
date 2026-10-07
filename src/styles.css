@@ -66,6 +66,19 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
   @supports (height:100dvh) { .flip-face { min-height:calc(100dvh - 1.5rem); } }
 }
 
+/* Créditos y derechos */
+.footer-legal { display:flex; flex-direction:column; gap:1.2rem; margin-top:3rem; padding-top:1.5rem; border-top:1px solid #352e3a; text-align:left; }
+.footer .footer-legal p { margin:0; color:#c8c0ca; font-size:.62rem; }
+.footer-legal div { display:flex; flex-direction:column; gap:.2rem; }
+.footer-legal strong { color:var(--paper); font-size:.62rem; font-weight:700; }
+.footer-legal a { color:var(--purple); font-size:.62rem; text-decoration:underline; text-underline-offset:3px; }
+.footer-legal a:hover { color:var(--turq); }
+
+@media (min-width:768px) {
+  .footer-legal { flex-direction:row; justify-content:space-between; align-items:flex-end; }
+  .footer-legal div { text-align:right; }
+}
+
 /* Fecha confirmada, ubicación y registro */
 .hero-date { color:var(--turq); font-size:clamp(.72rem,2.3vw,1rem); font-weight:700; letter-spacing:.11em; margin:1rem 0 .35rem; }
 .hero-date + .hero-caption { margin-top:.35rem; }
