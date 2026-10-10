@@ -1,0 +1,23 @@
+name: Resolve supplied map link
+on:
+  push:
+    branches: [feat/ubicacion-carrera-2027]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Expand location redirect
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "DESTINATION_URL_START"
+          curl --location --silent --show-error --max-time 30 \
+            -A 'Mozilla/5.0' -o /tmp/google-location.html \
+            -w '%{url_effective}\n' 'https://maps.app.goo.gl/fyMugBbwxmtimjzb7?g_st=ac'
+          echo "DESTINATION_URL_END"
+          grep -oE '<title>[^<]*' /tmp/google-location.html | head -c 300 || true
