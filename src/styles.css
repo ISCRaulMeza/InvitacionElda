@@ -148,6 +148,13 @@ button,.next-button { -webkit-appearance:none; appearance:none; touch-action:man
 .admin-actions .ghost { background:transparent; border:1px solid #5b5260; }
 .admin-actions .order-button { background:var(--purple); }
 .admin-actions .save-order { background:var(--turq); color:var(--ink); }
+.renumber-warning { margin:0 0 1.25rem; padding:1rem 1.15rem; border:1px solid var(--yellow); border-radius:16px; background:rgba(255,206,70,.1); }
+.renumber-warning strong { color:var(--yellow); font-size:.7rem; letter-spacing:.08em; }
+.renumber-warning p { margin:.55rem 0 1rem; color:#d5cbd5; font-size:.78rem; line-height:1.55; }
+.renumber-warning > div { display:flex; flex-wrap:wrap; gap:.6rem; }
+.renumber-warning button { width:auto; border:1px solid #6d6270; background:transparent; color:var(--paper); padding:.65rem 1rem; }
+.renumber-warning button.renumber-confirm { border-color:var(--turq); background:var(--turq); color:var(--ink); }
+.renumber-warning button:disabled { opacity:.55; }
 .admin-summary { display:grid; grid-template-columns:1fr auto; align-items:center; background:var(--turq); color:var(--ink); border-radius:20px; padding:1.2rem 1.4rem; margin:1.5rem 0; }
 .admin-summary span { font-size:.68rem; font-weight:700; letter-spacing:.13em; }
 .admin-summary strong { grid-row:span 2; font-family:'Bowlby One SC',sans-serif; font-size:3rem; line-height:1; color:var(--purple); }
