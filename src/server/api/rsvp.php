@@ -51,6 +51,44 @@ function validateRequestId(array $input): string
     return $requestId;
 }
 
+/**
+ * Ordena por dorsal y cierra huecos a partir del 7; los números 1-6 son reservados.
+ * Devuelve [filas, cantidad de participantes cuyo número cambió].
+ */
+function compactAttendeeNumbers(array $rows): array
+{
+    usort($rows, static fn(array $a, array $b): int => (int) $a[0] <=> (int) $b[0]);
+    $nextNumber = FIRST_AVAILABLE_NUMBER;
+    $changed = 0;
+
+    foreach ($rows as &$row) {
+        $oldNumber = (int) $row[0];
+        if ($oldNumber < FIRST_AVAILABLE_NUMBER) continue;
+        if ($oldNumber !== $nextNumber) $changed++;
+        $row[0] = (string) $nextNumber++;
+    }
+    unset($row);
+
+    return [$rows, $changed];
+}
+
+/** Graba la lista completa mientras el llamador mantiene el bloqueo exclusivo. */
+function saveAttendeeRows($file, array $rows): void
+{
+    rewind($file);
+    if (!ftruncate($file, 0) || fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']) === false) {
+        respond(500, ['ok' => false, 'message' => 'No se pudo actualizar la lista.']);
+    }
+    foreach ($rows as $row) {
+        if (fputcsv($file, $row) === false) {
+            respond(500, ['ok' => false, 'message' => 'No se pudo guardar la lista completa.']);
+        }
+    }
+    if (!fflush($file)) {
+        respond(500, ['ok' => false, 'message' => 'No se pudo completar el guardado.']);
+    }
+}
+
 function addAttendee(string $csvPath, string $name, string $requestId, ?int $requestedNumber = null): int
 {
     $file = fopen($csvPath, 'c+');
@@ -83,10 +121,16 @@ function addAttendee(string $csvPath, string $name, string $requestId, ?int $req
         respond(409, ['ok' => false, 'message' => "El número {$requestedNumber} ya está asignado. Elige otro."]);
     }
 
-    $number = $requestedNumber ?? FIRST_AVAILABLE_NUMBER;
-    while ($requestedNumber === null && isset($usedNumbers[$number])) {
-        $number++;
+    // Las altas manuales no deben crear nuevos huecos del 7 en adelante.
+    $nextAvailableNumber = FIRST_AVAILABLE_NUMBER;
+    while (isset($usedNumbers[$nextAvailableNumber])) $nextAvailableNumber++;
+    if ($requestedNumber !== null && $requestedNumber >= FIRST_AVAILABLE_NUMBER && $requestedNumber > $nextAvailableNumber) {
+        flock($file, LOCK_UN);
+        fclose($file);
+        respond(422, ['ok' => false, 'message' => "Para evitar saltos, usa el siguiente número libre: {$nextAvailableNumber} (o uno reservado del 1 al 6)."]);
     }
+
+    $number = $requestedNumber ?? $nextAvailableNumber;
     date_default_timezone_set('America/Mexico_City');
     fseek($file, 0, SEEK_END);
     if (ftell($file) === 0) {
@@ -182,23 +226,39 @@ if ($action === 'reorder') {
 
     $availableNumbers = array_keys($rowsByNumber);
     sort($availableNumbers, SORT_NUMERIC);
+    $nextNumber = FIRST_AVAILABLE_NUMBER;
     $reorderedRows = [];
     foreach (array_keys($requestedOrder) as $index => $oldNumber) {
         $row = $rowsByNumber[$oldNumber];
-        $row[0] = (string) $availableNumbers[$index];
+        $slot = $availableNumbers[$index];
+        $row[0] = (string) ($slot < FIRST_AVAILABLE_NUMBER ? $slot : $nextNumber++);
         $reorderedRows[] = $row;
     }
 
-    rewind($file);
-    ftruncate($file, 0);
-    fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
-    foreach ($reorderedRows as $row) {
-        fputcsv($file, $row);
-    }
-    fflush($file);
+    saveAttendeeRows($file, $reorderedRows);
     flock($file, LOCK_UN);
     fclose($file);
     respond(200, ['ok' => true]);
+}
+
+if ($action === 'renumber') {
+    requireAdmin($input);
+    $file = fopen($csvPath, 'c+');
+    if ($file === false || !flock($file, LOCK_EX)) {
+        if (is_resource($file)) fclose($file);
+        respond(500, ['ok' => false, 'message' => 'La lista está ocupada. Intenta nuevamente.']);
+    }
+
+    $rows = [];
+    rewind($file);
+    while (($row = fgetcsv($file)) !== false) {
+        if (isset($row[0]) && is_numeric($row[0])) $rows[] = $row;
+    }
+    [$rows, $changed] = compactAttendeeNumbers($rows);
+    if ($changed > 0) saveAttendeeRows($file, $rows);
+    flock($file, LOCK_UN);
+    fclose($file);
+    respond(200, ['ok' => true, 'renumberedCount' => $changed]);
 }
 
 if ($action === 'delete') {
@@ -216,10 +276,17 @@ if ($action === 'delete') {
 
     $remainingRows = [];
     $found = false;
+    $expectedName = isset($input['name']) ? (string) $input['name'] : null;
     rewind($file);
     while (($row = fgetcsv($file)) !== false) {
         if (!isset($row[0]) || !is_numeric($row[0])) continue;
         if ((int) $row[0] === $number) {
+            // Impide eliminar a otra persona si alguien renumeró la lista en otra sesión.
+            if ($expectedName !== null && !hash_equals((string) ($row[1] ?? ''), $expectedName)) {
+                flock($file, LOCK_UN);
+                fclose($file);
+                respond(409, ['ok' => false, 'message' => 'La lista cambió. Actualízala antes de eliminar.']);
+            }
             $found = true;
             continue;
         }
@@ -232,16 +299,11 @@ if ($action === 'delete') {
         respond(404, ['ok' => false, 'message' => 'El registro ya no existe.']);
     }
 
-    rewind($file);
-    ftruncate($file, 0);
-    fputcsv($file, ['number', 'name', 'confirmed_at', 'request_id']);
-    foreach ($remainingRows as $row) {
-        fputcsv($file, $row);
-    }
-    fflush($file);
+    [$remainingRows, $changed] = compactAttendeeNumbers($remainingRows);
+    saveAttendeeRows($file, $remainingRows);
     flock($file, LOCK_UN);
     fclose($file);
-    respond(200, ['ok' => true]);
+    respond(200, ['ok' => true, 'renumberedCount' => $changed]);
 }
 
 if ($action === 'list') {

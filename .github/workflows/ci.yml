@@ -22,6 +22,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Lint and test the PHP registration API
+        run: |
+          php -l src/server/api/rsvp.php
+          python3 tests/test_rsvp_api.py
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
