@@ -37,7 +37,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   readonly isAdminView = window.location.pathname.replace(/\/+$/, '').endsWith('/adminList');
   readonly mapUrl: SafeResourceUrl;
-  readonly directionsUrl = 'https://www.google.com/maps/search/?api=1&query=Parque+Metropolitano+de+Guadalajara';
+  readonly directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=20.6758968%2C-103.4400079&travelmode=driving';
 
   flippedSections = new Set<number>();
   guestName = '';
@@ -77,13 +77,13 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     ['📅', 'Fecha', 'SÁBADO 9 DE ENERO · 2027'],
     ['🕗', 'Llegada', '8:00 A. M.'],
     ['🚩', 'Banderazo de salida', '8:30 A. M.'],
-    ['📍', 'Lugar', 'PARQUE METROPOLITANO DE GUADALAJARA'],
+    ['📍', 'Lugar', 'PUNTO DE ENCUENTRO SEÑALADO EN EL MAPA'],
     ['🏃', 'Distancia', '3 KILÓMETROS'],
     ['🎂', 'Motivo', 'MI BIRTHDAY RUN · ELDA MEZA']
   ];
 
   constructor(sanitizer: DomSanitizer) {
-    this.mapUrl = sanitizer.bypassSecurityTrustResourceUrl('https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3732.9774204991654!2d-103.44231322631674!3d20.67049759999027!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8428aebac7b26f9b%3A0x7823b6a09cde5bb6!2sParque%20Metropolitano%20de%20Guadalajara!5e0!3m2!1ses!2smx!4v1791395380747!5m2!1ses!2smx');
+    this.mapUrl = sanitizer.bypassSecurityTrustResourceUrl('https://www.google.com/maps?q=20.6758968%2C-103.4400079&z=17&output=embed');
   }
 
   ngAfterViewInit(): void {
