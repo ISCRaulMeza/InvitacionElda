@@ -16,6 +16,7 @@ interface ApiResponse {
   message?: string;
   number?: number;
   attendees?: Attendee[];
+  renumberedCount?: number;
 }
 
 @Component({
@@ -55,6 +56,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
   manualGuestName = '';
   manualGuestNumber?: number;
   pendingDelete?: Attendee;
+  renumberConfirmationOpen = false;
   reorderMode = false;
   attendees: Attendee[] = [];
 
@@ -176,6 +178,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
 
   async refreshAdmin(): Promise<void> {
     this.adminNotice = '';
+    this.renumberConfirmationOpen = false;
     this.reorderMode = false;
     this.originalAttendeeOrder = [];
     this.reorderNumberSlots = [];
@@ -194,8 +197,43 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       return;
     }
     this.originalAttendeeOrder = this.attendees.map((person) => ({ ...person }));
-    this.reorderNumberSlots = this.attendees.map((person) => person.number).sort((a, b) => a - b);
+    let next = 7;
+    this.reorderNumberSlots = this.attendees.map((person) => person.number)
+      .sort((a, b) => a - b)
+      .map((number) => number < 7 ? number : next++);
     this.reorderMode = true;
+  }
+
+  get nextAvailableNumber(): number {
+    const used = new Set(this.attendees.map((person) => person.number));
+    let number = 7;
+    while (used.has(number)) number++;
+    return number;
+  }
+
+  get hasNumberGaps(): boolean {
+    const highest = Math.max(6, ...this.attendees.map((person) => person.number));
+    return this.nextAvailableNumber <= highest;
+  }
+
+  async renumberAttendees(): Promise<void> {
+    if (!this.renumberConfirmationOpen || this.adminActionLoading || this.reorderMode) return;
+    this.adminActionLoading = true;
+    this.adminError = '';
+    this.adminNotice = '';
+    try {
+      const result = await this.callApi({ action: 'renumber', password: this.adminPassword });
+      if (!result.ok) throw new Error(result.message || 'No fue posible corregir los números.');
+      this.renumberConfirmationOpen = false;
+      await this.loadAttendees();
+      this.adminNotice = (result.renumberedCount ?? 0) > 0
+        ? `Numeración corregida: ${result.renumberedCount} participante(s) tienen un dorsal actualizado.`
+        : 'Los números ya estaban consecutivos.';
+    } catch (error) {
+      this.adminError = error instanceof Error ? error.message : 'No fue posible corregir los números.';
+    } finally {
+      this.adminActionLoading = false;
+    }
   }
 
   displayedNumber(person: Attendee, index: number): number {
@@ -322,12 +360,15 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       const result = await this.callApi({
         action: 'delete',
         password: this.adminPassword,
-        number: String(person.number)
+        number: String(person.number),
+        name: person.name
       });
       if (!result.ok) throw new Error(result.message || 'No fue posible eliminar el registro.');
-      this.attendees = this.attendees.filter((attendee) => attendee.number !== person.number);
       this.pendingDelete = undefined;
-      this.adminNotice = `${person.name} fue eliminado de la lista.`;
+      await this.loadAttendees();
+      this.adminNotice = (result.renumberedCount ?? 0) > 0
+        ? `${person.name} fue eliminado. Se recorrieron ${result.renumberedCount} dorsal(es) para cerrar los espacios.`
+        : `${person.name} fue eliminado de la lista.`;
     } catch (error) {
       this.adminError = error instanceof Error ? error.message : 'No fue posible eliminar el registro.';
     } finally {
@@ -344,6 +385,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
     this.manualGuestName = '';
     this.manualGuestNumber = undefined;
     this.pendingDelete = undefined;
+    this.renumberConfirmationOpen = false;
     this.reorderMode = false;
     this.originalAttendeeOrder = [];
     this.reorderNumberSlots = [];
@@ -410,6 +452,7 @@ export class AppComponent implements AfterViewInit, OnDestroy {
       const result = await this.callApi({ action: 'list', password: this.adminPassword });
       if (!result.ok || !result.attendees) throw new Error(result.message || 'No fue posible cargar la lista.');
       this.attendees = result.attendees;
+      if (this.manualGuestNumber === undefined) this.manualGuestNumber = this.nextAvailableNumber;
       this.adminUnlocked = true;
     } catch (error) {
       this.adminUnlocked = false;
